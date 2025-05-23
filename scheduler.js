@@ -1,101 +1,42 @@
-(function() {
+(function () {
   function ScheduleAttack() {
     let timeout, interval;
 
     const init = () => {
-  const confirmBtn = $("#troop_confirm_go"),
-    arrivalTime = $("#date_arrival"),
-    form = $("#command-data-form"),
-    infoSpan = $('<span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>');
+      const form = $("#command-data-form");
+      const infoSpan = $('<span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>');
 
-  // Wrap form in a flex container if not already wrapped
-  if (!form.parent().attr("id") || form.parent().attr("id") !== "container") {
-    form.wrap('<div id="container" style="display:flex; gap: 20px; align-items:flex-start;"></div>');
-  }
-
-  const container = form.parent();
-
-  // Add support table on the left of the form
-  if ($("#support-table").length === 0) {
-    const supportTable = $(`
-      <table id="support-table" class="vis" style="width: 400px; border: 1px solid #ccc; background-color: #f0f0ff;">
-        <thead>
-          <tr><th colspan="2">Tabel Suport</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Info:</td><td>Detalii aici...</td></tr>
-          <tr><td>Status:</td><td><span style="color:green;">Activ</span></td></tr>
-          <tr><td colspan="2"><button class="btn" type="button">Actiune</button></td></tr>
-        </tbody>
-      </table>
-    `);
-    form.before(supportTable);
-  }
-
-  // Add schedule table on the right of the form
-  if ($("#schedule-table").length === 0) {
-    const scheduleTable = $(`
-      <table id="schedule-table" class="vis" style="width: 400px; border: 1px solid #ccc; background-color: #f9f9f9;">
-        <thead>
-          <tr><th colspan="2">Programează Atacul</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Mod:</td>
-            <td>
-              <input name="sa-mod" type="radio" value="arrival" checked> Soseste la
-              <input name="sa-mod" type="radio" value="launch"> Lanseaza la
-            </td>
-          </tr>
-          <tr>
-            <td>Data:</td>
-            <td><input name="sa-d" type="date" required style="width: 150px;"></td>
-          </tr>
-          <tr>
-            <td>Ora:</td>
-            <td>
-              <input name="sa-t-h" type="number" min="0" max="23" style="width:40px" required> :
-              <input name="sa-t-m" type="number" min="0" max="59" style="width:40px" required> :
-              <input name="sa-t-s" type="number" min="0" max="59" style="width:40px" required> :
-              <input name="sa-t-ms" type="number" min="0" max="999" style="width:40px" required>
-            </td>
-          </tr>
-          <tr><td>Lansare:</td><td id="sa-launch" style="color:green; font-weight:bold;"></td></tr>
-          <tr><td>Sosire:</td><td id="sa-arrival"></td></tr>
-          <tr><td>Intoarcere:</td><td id="sa-return"></td></tr>
-          <tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>
-          <tr>
-            <td colspan="2">
-              <button id="sa-save" class="btn" type="button">Salveaza</button>
-              ${infoSpan[0].outerHTML}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    `);
-
-    container.append(scheduleTable);
-
-    // Set default date to tomorrow
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const yyyy = tomorrow.getFullYear();
-    const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
-    const dd = String(tomorrow.getDate()).padStart(2, '0');
-    $('input[name="sa-d"]').val(`${yyyy}-${mm}-${dd}`);
-
-    // Clear time inputs
-    $('input[name="sa-t-h"], input[name="sa-t-m"], input[name="sa-t-s"], input[name="sa-t-ms"]').val("");
-
-    // Bind event handler
-    $("#sa-save").click(() => calculate());
-  }
-};
-
+      // Wrap form in a flex container if not already wrapped
+      if (!form.parent().attr("id") || form.parent().attr("id") !== "container") {
+        form.wrap('<div id="container" style="display:flex; gap: 20px; align-items:flex-start;"></div>');
+      }
 
       const container = form.parent();
 
-      // Only append the schedule table if not already added
+      // Insert Planner Table on the left
+      if ($("#planner-table").length === 0) {
+        const plannerTable = $(`
+          <table id="planner-table" class="vis" style="width: 400px; border: 1px solid #ccc; background-color: #e9f7ef;">
+            <thead>
+              <tr><th colspan="2">Planner</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Notă:</td><td><textarea rows="4" style="width: 100%; resize: vertical;"></textarea></td></tr>
+              <tr><td>Prioritate:</td><td>
+                <select style="width: 100%;">
+                  <option>Scăzută</option>
+                  <option>Medie</option>
+                  <option>Ridicată</option>
+                </select>
+              </td></tr>
+              <tr><td colspan="2"><button class="btn" type="button">Salvează Plan</button></td></tr>
+            </tbody>
+          </table>
+        `);
+        form.before(plannerTable);
+      }
+
+      // Insert Attack Schedule Table on the right
       if ($("#schedule-table").length === 0) {
         const scheduleTable = $(`
           <table id="schedule-table" class="vis" style="width: 400px; border: 1px solid #ccc; background-color: #f9f9f9;">
@@ -138,7 +79,7 @@
         `);
         container.append(scheduleTable);
 
-        // Set default date to tomorrow
+        // Default date: tomorrow
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const yyyy = tomorrow.getFullYear();
@@ -156,11 +97,10 @@
 
     const getServerTime = () => Math.round(Timing.getCurrentServerTime());
 
-    const getTravelTime = () =>
-      1000 * $("#command-data-form").find(".relative_time").data("duration");
+    const getTravelTime = () => 1000 * $("#command-data-form").find(".relative_time").data("duration");
 
     const getDateInput = () => {
-      let d = new Date($('input[name="sa-d"]').val());
+      const d = new Date($('input[name="sa-d"]').val());
       d.setHours($('input[name="sa-t-h"]').val());
       d.setMinutes($('input[name="sa-t-m"]').val());
       d.setSeconds($('input[name="sa-t-s"]').val());
@@ -180,7 +120,7 @@
     const setReturnTime = (t) => $("#sa-return").text(formatTime(t));
 
     const formatCountdown = (ms) => {
-      let h = Math.floor(ms / 3600000),
+      const h = Math.floor(ms / 3600000),
         m = Math.floor((ms % 3600000) / 60000),
         s = Math.floor((ms % 60000) / 1000),
         msRem = ms % 1000;
@@ -216,9 +156,7 @@
           ? inputDate
           : new Date(inputDate.getTime() + duration);
 
-        const returnTime = new Date(
-          1000 * Math.floor(arrivalTime.getTime() / 1000) + duration
-        );
+        const returnTime = new Date(1000 * Math.floor(arrivalTime.getTime() / 1000) + duration);
 
         clearTimeout(timeout);
         clearInterval(interval);
@@ -231,7 +169,7 @@
         setReturnTime(returnTime);
 
         interval = setInterval(() => {
-          let remaining = launchTime.getTime() - getServerTime();
+          const remaining = launchTime.getTime() - getServerTime();
           if (remaining <= 0) {
             clearInterval(interval);
             $("#sa-countdown").text("00:00:00.000");
