@@ -3,64 +3,72 @@
     let timeout, interval;
 
     const init = () => {
-      const form = $("#command-data-form");
+      const container = $("#content_value");
 
-      // Wrap form in flex container if not already wrapped
-      if (!form.parent().attr("id") || form.parent().attr("id") !== "container") {
-        form.wrap('<div id="container" style="display:flex; align-items:flex-start; gap: 20px;"></div>');
+      if (container.length === 0) {
+        alert("Element with id 'content_value' not found!");
+        return;
       }
 
-      const container = form.parent();
+      // Make container a flexbox for side-by-side layout
+      container.css({
+        display: "flex",
+        gap: "20px",
+        alignItems: "flex-start",
+      });
 
-      // Remove planner table if it exists (cleanup)
-      $("#planner-table").remove();
+      // Get the existing command table container div (assumed first div inside container)
+      const existingDiv = container.children("div").first();
 
-      // Add Schedule table as sibling inside the container div (only if not exists)
       if ($("#schedule-table").length === 0) {
-        const scheduleTable = $(`
-          <table id="schedule-table" class="vis" style="width: 400px; border: 1px solid #ccc; background-color: #f9f9f9;">
-            <thead>
-              <tr><th colspan="2">Programează Atacul</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Mod:</td>
-                <td>
-                  <input name="sa-mod" type="radio" value="arrival" checked> Soseste la
-                  <input name="sa-mod" type="radio" value="launch"> Lanseaza la
-                </td>
-              </tr>
-              <tr>
-                <td>Data:</td>
-                <td><input name="sa-d" type="date" required style="width: 150px;"></td>
-              </tr>
-              <tr>
-                <td>Ora:</td>
-                <td>
-                  <input name="sa-t-h" type="number" min="0" max="23" style="width:40px" required> :
-                  <input name="sa-t-m" type="number" min="0" max="59" style="width:40px" required> :
-                  <input name="sa-t-s" type="number" min="0" max="59" style="width:40px" required> :
-                  <input name="sa-t-ms" type="number" min="0" max="999" style="width:40px" required>
-                </td>
-              </tr>
-              <tr><td>Lansare:</td><td id="sa-launch" style="color:green; font-weight:bold;"></td></tr>
-              <tr><td>Sosire:</td><td id="sa-arrival"></td></tr>
-              <tr><td>Intoarcere:</td><td id="sa-return"></td></tr>
-              <tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>
-              <tr>
-                <td colspan="2">
-                  <button id="sa-save" class="btn" type="button">Salveaza</button>
-                  <span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        const scheduleDiv = $(`
+          <div>
+            <table id="schedule-table" class="vis" style="width: 400px; border: 1px solid #ccc; background-color: #f9f9f9;">
+              <thead>
+                <tr><th colspan="2">Programează Atacul</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Mod:</td>
+                  <td>
+                    <input name="sa-mod" type="radio" value="arrival" checked> Soseste la
+                    <input name="sa-mod" type="radio" value="launch"> Lanseaza la
+                  </td>
+                </tr>
+                <tr>
+                  <td>Data:</td>
+                  <td><input name="sa-d" type="date" required style="width: 150px;"></td>
+                </tr>
+                <tr>
+                  <td>Ora:</td>
+                  <td>
+                    <input name="sa-t-h" type="number" min="0" max="23" style="width:40px" required> :
+                    <input name="sa-t-m" type="number" min="0" max="59" style="width:40px" required> :
+                    <input name="sa-t-s" type="number" min="0" max="59" style="width:40px" required> :
+                    <input name="sa-t-ms" type="number" min="0" max="999" style="width:40px" required>
+                  </td>
+                </tr>
+                <tr><td>Lansare:</td><td id="sa-launch" style="color:green; font-weight:bold;"></td></tr>
+                <tr><td>Sosire:</td><td id="sa-arrival"></td></tr>
+                <tr><td>Intoarcere:</td><td id="sa-return"></td></tr>
+                <tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>
+                <tr>
+                  <td colspan="2">
+                    <button id="sa-save" class="btn" type="button">Salveaza</button>
+                    <span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         `);
-        container.append(scheduleTable);
 
-        // Clear time inputs on init
+        existingDiv.after(scheduleDiv);
+
+        // Clear time inputs initially
         $('input[name="sa-t-h"], input[name="sa-t-m"], input[name="sa-t-s"], input[name="sa-t-ms"]').val("");
 
+        // Bind save button
         $("#sa-save").click(() => calculate());
       }
     };
@@ -156,6 +164,7 @@
       }
     };
 
+    // Check if on the right page with the form
     if ($("#command-data-form").length === 0) {
       alert("Trebuie sa fii pe pagina de confirmare a comenzii!");
     } else {
