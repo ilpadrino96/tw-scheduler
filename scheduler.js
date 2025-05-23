@@ -10,7 +10,7 @@
         form.wrap('<div id="container" style="display:flex; align-items:flex-start; gap: 20px;"></div>');
       }
 
-      const container = form.parent(); // #container div
+      const container = form.parent();
 
       // Add Planner table on the LEFT side of the form
       if ($("#planner-table").length === 0) {
@@ -32,7 +32,7 @@
             </tbody>
           </table>
         `);
-        container.prepend(plannerTable); // Insert inside container, before the form
+        container.prepend(plannerTable);
       }
 
       // Add Schedule table on the RIGHT side of the form
@@ -76,9 +76,9 @@
             </tbody>
           </table>
         `);
-        container.append(scheduleTable); // Insert inside container, after the form
+        container.append(scheduleTable);
 
-        // Default date setup
+        // Set default date to tomorrow AFTER appending the table
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const yyyy = tomorrow.getFullYear();
@@ -86,6 +86,7 @@
         const dd = String(tomorrow.getDate()).padStart(2, '0');
         $('input[name="sa-d"]').val(`${yyyy}-${mm}-${dd}`);
 
+        // Clear time inputs
         $('input[name="sa-t-h"], input[name="sa-t-m"], input[name="sa-t-s"], input[name="sa-t-ms"]').val("");
 
         $("#sa-save").click(() => calculate());
