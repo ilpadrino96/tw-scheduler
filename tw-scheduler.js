@@ -1,11 +1,3 @@
-function waitForGlobals(callback) {
-  if (typeof Timing !== "undefined" && Timing.getCurrentServerTime && window.Format) {
-    callback();
-  } else {
-    setTimeout(() => waitForGlobals(callback), 100);
-  }
-}
-
 waitForGlobals(() => {
   const contentValue = document.getElementById("content_value");
   if (!contentValue) return alert("#content_value not found");
@@ -71,17 +63,28 @@ waitForGlobals(() => {
 
     flexWrapper.appendChild(scheduleTable);
 
-    // Mutăm butonul Salveaza jos lângă Trimite atacul
-    const submitBtn = form.querySelector("#troop_confirm_submit");
-    if (submitBtn && !document.getElementById("sa-save")) {
-      const saveBtn = document.createElement("button");
-      saveBtn.id = "sa-save";
-      saveBtn.className = "btn";
-      saveBtn.type = "button";
-      saveBtn.textContent = "Salveaza";
+    // Mutam crearea si inserarea butonului Salveaza aici, dupa tabela
+    // Ștergem butonul dacă există deja
+    const oldSaveBtn = document.getElementById("sa-save");
+    if (oldSaveBtn) oldSaveBtn.remove();
 
+    const saveBtn = document.createElement("button");
+    saveBtn.id = "sa-save";
+    saveBtn.type = "button";
+    saveBtn.className = "btn";
+    saveBtn.textContent = "Salveaza";
+    saveBtn.style.marginLeft = "10px";
+
+    // Căutăm butonul de trimis atacul
+    const submitBtn = form.querySelector("#troop_confirm_submit");
+    if (submitBtn) {
       submitBtn.insertAdjacentElement("afterend", saveBtn);
+    } else {
+      // Dacă nu există, îl punem sub tabel ca fallback
+      flexWrapper.appendChild(saveBtn);
     }
+
+    // Rămâne codul pentru funcționalitate buton Salveaza
 
     let timeout, interval;
 
@@ -181,6 +184,6 @@ waitForGlobals(() => {
       }
     };
 
-    document.getElementById("sa-save").addEventListener("click", calculate);
+    saveBtn.addEventListener("click", calculate);
   }
 });
