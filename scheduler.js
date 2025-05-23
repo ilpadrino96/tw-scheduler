@@ -12,30 +12,10 @@
 
       const container = form.parent();
 
-      // Add Planner table on the LEFT side of the form
-      if ($("#planner-table").length === 0) {
-        const plannerTable = $(`
-          <table id="planner-table" class="vis" style="width: 400px; border: 1px solid #ccc; background-color: #e9f7ef;">
-            <thead>
-              <tr><th colspan="2">Planner</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>Notă:</td><td><textarea rows="4" style="width: 100%; resize: vertical;"></textarea></td></tr>
-              <tr><td>Prioritate:</td><td>
-                <select style="width: 100%;">
-                  <option>Scăzută</option>
-                  <option>Medie</option>
-                  <option>Ridicată</option>
-                </select>
-              </td></tr>
-              <tr><td colspan="2"><button class="btn" type="button">Salvează Plan</button></td></tr>
-            </tbody>
-          </table>
-        `);
-        container.prepend(plannerTable);
-      }
+      // Remove planner table if it exists (cleanup)
+      $("#planner-table").remove();
 
-      // Add Schedule table on the RIGHT side of the form
+      // Add Schedule table as sibling inside the container div (only if not exists)
       if ($("#schedule-table").length === 0) {
         const scheduleTable = $(`
           <table id="schedule-table" class="vis" style="width: 400px; border: 1px solid #ccc; background-color: #f9f9f9;">
@@ -78,15 +58,7 @@
         `);
         container.append(scheduleTable);
 
-        // Set default date to tomorrow AFTER appending the table
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const yyyy = tomorrow.getFullYear();
-        const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
-        const dd = String(tomorrow.getDate()).padStart(2, '0');
-        $('input[name="sa-d"]').val(`${yyyy}-${mm}-${dd}`);
-
-        // Clear time inputs
+        // Clear time inputs on init
         $('input[name="sa-t-h"], input[name="sa-t-m"], input[name="sa-t-s"], input[name="sa-t-ms"]').val("");
 
         $("#sa-save").click(() => calculate());
