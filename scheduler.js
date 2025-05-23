@@ -1,94 +1,77 @@
 (function () {
-  function ScheduleAttack() {
+  const contentValue = document.getElementById("content_value");
+  if (!contentValue) return alert("#content_value not found");
+
+  const form = contentValue.querySelector("form");
+  if (!form) return alert("form inside #content_value not found");
+
+  const existingDiv = form.querySelector("div");
+  if (!existingDiv) return alert("Existing div with first table not found");
+
+  // Create flex wrapper if not exists
+  let flexWrapper = form.querySelector("#flex-wrapper");
+  if (!flexWrapper) {
+    flexWrapper = document.createElement("div");
+    flexWrapper.id = "flex-wrapper";
+    flexWrapper.style.display = "flex";
+    flexWrapper.style.flexDirection = "row";
+    flexWrapper.style.alignItems = "flex-start";
+    flexWrapper.style.gap = "20px";
+    flexWrapper.style.marginBottom = "20px";
+
+    form.insertBefore(flexWrapper, existingDiv);
+    flexWrapper.appendChild(existingDiv);
+  }
+
+  // Prevent duplicate schedule table
+  if (!document.getElementById("schedule-table")) {
+    const scheduleTable = document.createElement("table");
+    scheduleTable.id = "schedule-table";
+    scheduleTable.className = "vis";
+    scheduleTable.width = "460";
+
+    scheduleTable.innerHTML = `
+      <thead>
+        <tr><th colspan="2">Programează Atacul</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Mod:</td>
+          <td>
+            <input name="sa-mod" type="radio" value="arrival" checked> Soseste la
+            <input name="sa-mod" type="radio" value="launch"> Lanseaza la
+          </td>
+        </tr>
+        <tr>
+          <td>Data:</td>
+          <td><input name="sa-d" type="date" required style="width: 150px;"></td>
+        </tr>
+        <tr>
+          <td>Ora:</td>
+          <td>
+            <input name="sa-t-h" type="number" min="0" max="23" style="width:40px" required> :
+            <input name="sa-t-m" type="number" min="0" max="59" style="width:40px" required> :
+            <input name="sa-t-s" type="number" min="0" max="59" style="width:40px" required> :
+            <input name="sa-t-ms" type="number" min="0" max="999" style="width:40px" required>
+          </td>
+        </tr>
+        <tr><td>Lansare:</td><td id="sa-launch" style="color:green; font-weight:bold;"></td></tr>
+        <tr><td>Sosire:</td><td id="sa-arrival"></td></tr>
+        <tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>
+        <tr>
+          <td colspan="2">
+            <button id="sa-save" class="btn" type="button">Salveaza</button>
+            <span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>
+          </td>
+        </tr>
+      </tbody>
+    `;
+
+    flexWrapper.appendChild(scheduleTable);
+
+    // Attack functionality
     let timeout, interval;
 
-    const container = document.getElementById("content_value");
-    if (!container) {
-      alert("Container with id 'content_value' not found!");
-      return;
-    }
-
-    // Set container as flex container (horizontal layout)
-    container.style.display = "flex";
-    container.style.flexDirection = "row";
-    container.style.alignItems = "flex-start";
-    container.style.gap = "20px";
-
-    // Find the existing left table container div (the one with your existing table)
-    const existingDiv = container.querySelector("div");
-    if (!existingDiv) {
-      alert("Expected a div with the existing table inside #content_value!");
-      return;
-    }
-
-    // Only add schedule table if not exists
-    if (!document.getElementById("schedule-table")) {
-      // Create wrapper div for schedule table with subtle styling
-      const scheduleDiv = document.createElement("div");
-      scheduleDiv.style.marginLeft = "20px";
-      scheduleDiv.style.border = "1px solid rgba(0, 0, 0, 0.1)";
-      scheduleDiv.style.borderRadius = "6px";
-      scheduleDiv.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.1)";
-      scheduleDiv.style.padding = "10px";
-      scheduleDiv.style.backgroundColor = "transparent";
-
-      // Create the schedule table
-      const scheduleTable = document.createElement("table");
-      scheduleTable.id = "schedule-table";
-      scheduleTable.className = "vis";
-      scheduleTable.style.border = "none";
-      scheduleTable.style.backgroundColor = "transparent";
-      scheduleTable.style.width = "400px";
-
-      scheduleTable.innerHTML = `
-        <thead>
-          <tr><th colspan="2">Programează Atacul</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Mod:</td>
-            <td>
-              <input name="sa-mod" type="radio" value="arrival" checked> Soseste la
-              <input name="sa-mod" type="radio" value="launch"> Lanseaza la
-            </td>
-          </tr>
-          <tr>
-            <td>Data:</td>
-            <td><input name="sa-d" type="date" required style="width: 150px;"></td>
-          </tr>
-          <tr>
-            <td>Ora:</td>
-            <td>
-              <input name="sa-t-h" type="number" min="0" max="23" style="width:40px" required> :
-              <input name="sa-t-m" type="number" min="0" max="59" style="width:40px" required> :
-              <input name="sa-t-s" type="number" min="0" max="59" style="width:40px" required> :
-              <input name="sa-t-ms" type="number" min="0" max="999" style="width:40px" required>
-            </td>
-          </tr>
-          <tr><td>Lansare:</td><td id="sa-launch" style="color:green; font-weight:bold;"></td></tr>
-          <tr><td>Sosire:</td><td id="sa-arrival"></td></tr>
-          <tr><td>Intoarcere:</td><td id="sa-return"></td></tr>
-          <tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>
-          <tr>
-            <td colspan="2">
-              <button id="sa-save" class="btn" type="button">Salveaza</button>
-              <span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>
-            </td>
-          </tr>
-        </tbody>
-      `;
-
-      // Append the schedule table to wrapper div
-      scheduleDiv.appendChild(scheduleTable);
-
-      // Insert the schedule wrapper div after the existing div inside container
-      existingDiv.after(scheduleDiv);
-
-      // Setup event listener for Save button
-      document.getElementById("sa-save").addEventListener("click", () => calculate());
-    }
-
-    // Helper functions for timing and calculation
     const getServerTime = () => Math.round(Timing.getCurrentServerTime());
     const getTravelTime = () => 1000 * document.querySelector("#command-data-form .relative_time").dataset.duration;
 
@@ -183,13 +166,8 @@
           clearInterval(interval);
         }, delay);
       }
-    }
-  // End of ScheduleAttack constructor function
+    };
 
-    // Initialize immediately
-    ScheduleAttack.prototype.init = function () {};
-    return new ScheduleAttack();
+    document.getElementById("sa-save").addEventListener("click", calculate);
   }
-
-  window.ScheduleAttack = ScheduleAttack();
 })();
