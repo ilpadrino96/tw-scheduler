@@ -8,13 +8,14 @@
         form = $("#command-data-form"),
         infoSpan = $('<span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>');
 
-      // Adjust table width
-      arrivalTime.parents("table:first").attr("width", 500);
+      // Adjust table width of arrivalTime parent to make space
+      arrivalTime.parents("table:first").attr("width", 300);
 
-      // Insert scheduling UI after arrivalTime's parent
-      arrivalTime.parent().after(
-        '<tr><td>Programeaza:</td><td style="position: relative">' +
-          '<table><tbody>' +
+      // Create a new table container for the scheduling UI
+      const scheduleTable = $(
+        '<table id="sa-schedule" style="width: 500px; float: right; border: 1px solid #ccc; padding: 5px; background: #f9f9f9;">' +
+          '<tbody>' +
+          '<tr><td>Programeaza:</td><td style="position: relative"></td></tr>' +
           '<tr><td>Mod:</td><td>' +
           '<input name="sa-mod" type="radio" value="arrival" checked>Soseste la ' +
           '<input name="sa-mod" type="radio" value="launch"> Lanseaza la' +
@@ -33,15 +34,25 @@
           '<tr><td><button type="button" id="sa-save" class="btn float_left">Salveaza</button>' +
           infoSpan[0].outerHTML +
           '</td></tr>' +
-          '</tbody></table>' +
-          '</td></tr>'
+          '</tbody></table>'
       );
+
+      // Append the scheduling UI table to the form container or a suitable parent
+      form.after(scheduleTable);
+
+      // Set default date to tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const yyyy = tomorrow.getFullYear();
+      const mm = String(tomorrow.getMonth() + 1).padStart(2, '0'); // Months start at 0!
+      const dd = String(tomorrow.getDate()).padStart(2, '0');
+      $('input[name="sa-d"]').val(`${yyyy}-${mm}-${dd}`);
+
+      // Clear time inputs
+      $('input[name="sa-t-h"], input[name="sa-t-m"], input[name="sa-t-s"], input[name="sa-t-ms"]').val("");
 
       // Set event handler on save button
       $("#sa-save").click(() => calculate());
-
-      // Clear inputs
-      $('input[name="sa-d"], input[name="sa-t-h"], input[name="sa-t-m"], input[name="sa-t-s"], input[name="sa-t-ms"]').val("");
     };
 
     const getServerTime = () => Math.round(Timing.getCurrentServerTime());
