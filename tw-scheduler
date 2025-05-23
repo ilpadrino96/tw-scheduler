@@ -1,1 +1,158 @@
-javascript:(function(){function S(){let t,o;const e=()=>{const e=$("#troop_confirm_go"),n=$("#date_arrival"),a=$("#command-data-form"),i=$('<span class="float_right" style="position: absolute; right: 5px;padding: 3px">🌽🌽🌽</span>');n.parents("table:first").attr("width",500),n.parent().after('<tr><td>Programeaza:</td><td style="position: relative"><table><tbody><tr><td>Mod:</td><td><input name="sa-mod" type="radio" value="arrival" checked>Soseste la <input name="sa-mod" type="radio" value="launch"> Lanseaza la</td></tr><tr><td>Data:</td><td><input name="sa-d" type="date" required></td></tr><tr><td>Ora:</td><td><input name="sa-t-h" type="number" min="0" max="23" style="width:40px" required>:<input name="sa-t-m" type="number" min="0" max="59" style="width:40px" required>:<input name="sa-t-s" type="number" min="0" max="59" style="width:40px" required>:<input name="sa-t-ms" type="number" min="0" max="999" style="width:40px" required></td></tr><tr><td>Lansare:</td><td id="sa-launch" style="color:green;font-weight:bold;"></td></tr><tr><td>Sosire:</td><td id="sa-arrival"></td></tr><tr><td>Intoarcere:</td><td id="sa-return"></td></tr><tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold;color:blue;"></td></tr><tr><td><button type="button" id="sa-save" class="btn float_left">Salveaza</button>'+i[0].outerHTML+"</td></tr></tbody></table></td></tr>"),$("#sa-save").click(()=>r()),$('input[name="sa-d"],input[name="sa-t-h"],input[name="sa-t-m"],input[name="sa-t-s"],input[name="sa-t-ms"]').val("")},m=()=>Math.round(Timing.getCurrentServerTime()),l=()=>1e3*$("#command-data-form").find(".relative_time").data("duration"),u=()=>{let t=new Date($('input[name="sa-d"]').val());return t.setHours($('input[name="sa-t-h"]').val()),t.setMinutes($('input[name="sa-t-m"]').val()),t.setSeconds($('input[name="sa-t-s"]').val()),t.setMilliseconds($('input[name="sa-t-ms"]').val()),t},c=()=>$('input[name="sa-mod"]:checked').val()==="arrival",f=t=>t instanceof Date?window.Format.date(t/1e3,!0)+":"+window.Format.padLead(t.getUTCMilliseconds(),3):0,d=t=>$("#sa-launch").text(f(t)),h=t=>$("#sa-arrival").text(f(t)),v=t=>$("#sa-return").text(f(t)),g=t=>{let e=Math.floor(t/36e5),n=Math.floor(t%36e5/6e4),a=Math.floor(t%6e4/1e3),i=t%1e3;return${String(e).padStart(2,"0")}:${String(n).padStart(2,"0")}:${String(a).padStart(2,"0")}.${String(i).padStart(3,"0")}},b=()=>{try{const t=new(window.AudioContext||window.webkitAudioContext),o=t.createOscillator(),e=t.createGain();o.type="sine",o.frequency.setValueAtTime(880,t.currentTime),o.connect(e),e.connect(t.destination),o.start(),e.gain.exponentialRampToValueAtTime(.0001,t.currentTime+.2),o.stop(t.currentTime+.2)}catch(t){}},r=()=>{if($("#command-data-form")[0].reportValidity()){const s=u(),n=l(),a=c()?new Date(s.getTime()-n):s,i=c()?s:new Date(s.getTime()+n),y=new Date(1e3*Math.floor(i.getTime()/1e3)+n);clearTimeout(t),clearInterval(o);let p=a.getTime()-m();p<0&&(p=0),d(a),h(i),v(y),o=setInterval(()=>{let t=a.getTime()-m();t<=0?(clearInterval(o),$("#sa-countdown").text("00:00:00.000")):$("#sa-countdown").text(g(t))},50),t=setTimeout(()=>{b(),HTMLFormElement.prototype.submit.call(document.getElementById("command-data-form")),clearInterval(o)},p)}};$("#command-data-form").length===0?alert("Trebuie sa fii pe pagina de confirmare a comenzii!"):e()}window.ScheduleAttack=new S();})();
+(function() {
+  function ScheduleAttack() {
+    let timeout, interval;
+
+    const init = () => {
+      const confirmBtn = $("#troop_confirm_go"),
+        arrivalTime = $("#date_arrival"),
+        form = $("#command-data-form"),
+        infoSpan = $('<span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽🌽🌽</span>');
+
+      // Adjust table width
+      arrivalTime.parents("table:first").attr("width", 500);
+
+      // Insert scheduling UI after arrivalTime's parent
+      arrivalTime.parent().after(
+        '<tr><td>Programeaza:</td><td style="position: relative">' +
+          '<table><tbody>' +
+          '<tr><td>Mod:</td><td>' +
+          '<input name="sa-mod" type="radio" value="arrival" checked>Soseste la ' +
+          '<input name="sa-mod" type="radio" value="launch"> Lanseaza la' +
+          '</td></tr>' +
+          '<tr><td>Data:</td><td><input name="sa-d" type="date" required></td></tr>' +
+          '<tr><td>Ora:</td><td>' +
+          '<input name="sa-t-h" type="number" min="0" max="23" style="width:40px" required>: ' +
+          '<input name="sa-t-m" type="number" min="0" max="59" style="width:40px" required>: ' +
+          '<input name="sa-t-s" type="number" min="0" max="59" style="width:40px" required>: ' +
+          '<input name="sa-t-ms" type="number" min="0" max="999" style="width:40px" required>' +
+          '</td></tr>' +
+          '<tr><td>Lansare:</td><td id="sa-launch" style="color:green; font-weight:bold;"></td></tr>' +
+          '<tr><td>Sosire:</td><td id="sa-arrival"></td></tr>' +
+          '<tr><td>Intoarcere:</td><td id="sa-return"></td></tr>' +
+          '<tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>' +
+          '<tr><td><button type="button" id="sa-save" class="btn float_left">Salveaza</button>' +
+          infoSpan[0].outerHTML +
+          '</td></tr>' +
+          '</tbody></table>' +
+          '</td></tr>'
+      );
+
+      // Set event handler on save button
+      $("#sa-save").click(() => calculate());
+
+      // Clear inputs
+      $('input[name="sa-d"], input[name="sa-t-h"], input[name="sa-t-m"], input[name="sa-t-s"], input[name="sa-t-ms"]').val("");
+    };
+
+    const getServerTime = () => Math.round(Timing.getCurrentServerTime());
+
+    const getTravelTime = () =>
+      1000 * $("#command-data-form").find(".relative_time").data("duration");
+
+    const getDateInput = () => {
+      let d = new Date($('input[name="sa-d"]').val());
+      d.setHours($('input[name="sa-t-h"]').val());
+      d.setMinutes($('input[name="sa-t-m"]').val());
+      d.setSeconds($('input[name="sa-t-s"]').val());
+      d.setMilliseconds($('input[name="sa-t-ms"]').val());
+      return d;
+    };
+
+    const isArrivalMode = () => $('input[name="sa-mod"]:checked').val() === "arrival";
+
+    const formatTime = (d) =>
+      d instanceof Date
+        ? window.Format.date(d / 1000, true) + ":" + window.Format.padLead(d.getUTCMilliseconds(), 3)
+        : 0;
+
+    const setLaunchTime = (t) => $("#sa-launch").text(formatTime(t));
+
+    const setArrivalTime = (t) => $("#sa-arrival").text(formatTime(t));
+
+    const setReturnTime = (t) => $("#sa-return").text(formatTime(t));
+
+    const formatCountdown = (ms) => {
+      let h = Math.floor(ms / 3600000),
+        m = Math.floor((ms % 3600000) / 60000),
+        s = Math.floor((ms % 60000) / 1000),
+        msRem = ms % 1000;
+      return (
+        `${String(h).padStart(2, "0")}:` +
+        `${String(m).padStart(2, "0")}:` +
+        `${String(s).padStart(2, "0")}.` +
+        `${String(msRem).padStart(3, "0")}`
+      );
+    };
+
+    const playBeep = () => {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)(),
+          osc = ctx.createOscillator(),
+          gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.2);
+        osc.stop(ctx.currentTime + 0.2);
+      } catch (e) {
+        console.warn("Beep not supported", e);
+      }
+    };
+
+    const calculate = () => {
+      if ($("#command-data-form")[0].reportValidity()) {
+        const inputDate = getDateInput(),
+          duration = getTravelTime();
+
+        // Calculate launch and arrival depending on mode
+        const launchTime = isArrivalMode()
+          ? new Date(inputDate.getTime() - duration)
+          : inputDate;
+        const arrivalTime = isArrivalMode()
+          ? inputDate
+          : new Date(inputDate.getTime() + duration);
+
+        const returnTime = new Date(
+          1000 * Math.floor(arrivalTime.getTime() / 1000) + duration
+        );
+
+        clearTimeout(timeout);
+        clearInterval(interval);
+
+        let delay = launchTime.getTime() - getServerTime();
+        if (delay < 0) delay = 0;
+
+        setLaunchTime(launchTime);
+        setArrivalTime(arrivalTime);
+        setReturnTime(returnTime);
+
+        interval = setInterval(() => {
+          let remaining = launchTime.getTime() - getServerTime();
+          if (remaining <= 0) {
+            clearInterval(interval);
+            $("#sa-countdown").text("00:00:00.000");
+          } else {
+            $("#sa-countdown").text(formatCountdown(remaining));
+          }
+        }, 50);
+
+        timeout = setTimeout(() => {
+          playBeep();
+          HTMLFormElement.prototype.submit.call(document.getElementById("command-data-form"));
+          clearInterval(interval);
+        }, delay);
+      }
+    };
+
+    // Check if we're on the right page
+    if ($("#command-data-form").length === 0) {
+      alert("Trebuie sa fii pe pagina de confirmare a comenzii!");
+    } else {
+      init();
+    }
+  }
+
+  window.ScheduleAttack = new ScheduleAttack();
+})();
