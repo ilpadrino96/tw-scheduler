@@ -1,4 +1,4 @@
-waitForGlobals(() => {
+(() => {
   const contentValue = document.getElementById("content_value");
   if (!contentValue) return alert("#content_value not found");
 
@@ -8,7 +8,7 @@ waitForGlobals(() => {
   const existingDiv = form.querySelector("div");
   if (!existingDiv) return alert("Existing div with first table not found");
 
-  // Create flex wrapper if not exists
+  // Creează flex wrapper dacă nu există
   let flexWrapper = form.querySelector("#flex-wrapper");
   if (!flexWrapper) {
     flexWrapper = document.createElement("div");
@@ -56,35 +56,23 @@ waitForGlobals(() => {
         </tr>
         <tr><td>Lansare:</td><td id="sa-launch" style="color:green; font-weight:bold;"></td></tr>
         <tr><td>Sosire:</td><td id="sa-arrival"></td></tr>
-        <tr><td>Intoarcere:</td><td id="sa-return"></td></tr>
         <tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>
       </tbody>
     `;
 
     flexWrapper.appendChild(scheduleTable);
 
-    // Mutam crearea si inserarea butonului Salveaza aici, dupa tabela
-    // Ștergem butonul dacă există deja
-    const oldSaveBtn = document.getElementById("sa-save");
-    if (oldSaveBtn) oldSaveBtn.remove();
+    // Mută butonul Salveaza în formular, jos lângă trimite atacul
+    const saveBtn = document.getElementById("sa-save");
+    if (saveBtn) saveBtn.remove(); // elimină butonul din tabel dacă există deja
 
-    const saveBtn = document.createElement("button");
-    saveBtn.id = "sa-save";
-    saveBtn.type = "button";
-    saveBtn.className = "btn";
-    saveBtn.textContent = "Salveaza";
-    saveBtn.style.marginLeft = "10px";
+    const newSaveBtn = document.createElement("button");
+    newSaveBtn.id = "sa-save";
+    newSaveBtn.className = "btn";
+    newSaveBtn.type = "button";
+    newSaveBtn.textContent = "Salveaza Programarea";
 
-    // Căutăm butonul de trimis atacul
-    const submitBtn = form.querySelector("#troop_confirm_submit");
-    if (submitBtn) {
-      submitBtn.insertAdjacentElement("afterend", saveBtn);
-    } else {
-      // Dacă nu există, îl punem sub tabel ca fallback
-      flexWrapper.appendChild(saveBtn);
-    }
-
-    // Rămâne codul pentru funcționalitate buton Salveaza
+    form.appendChild(newSaveBtn);
 
     let timeout, interval;
 
@@ -184,6 +172,6 @@ waitForGlobals(() => {
       }
     };
 
-    saveBtn.addEventListener("click", calculate);
+    newSaveBtn.addEventListener("click", calculate);
   }
-});
+})();
