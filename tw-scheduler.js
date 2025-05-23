@@ -1,4 +1,12 @@
-(function () {
+function waitForGlobals(callback) {
+  if (typeof Timing !== "undefined" && Timing.getCurrentServerTime && window.Format) {
+    callback();
+  } else {
+    setTimeout(() => waitForGlobals(callback), 100);
+  }
+}
+
+waitForGlobals(() => {
   const contentValue = document.getElementById("content_value");
   if (!contentValue) return alert("#content_value not found");
 
@@ -23,7 +31,6 @@
     flexWrapper.appendChild(existingDiv);
   }
 
-  // Prevent duplicate schedule table
   if (!document.getElementById("schedule-table")) {
     const scheduleTable = document.createElement("table");
     scheduleTable.id = "schedule-table";
@@ -69,7 +76,6 @@
 
     flexWrapper.appendChild(scheduleTable);
 
-    // Attack functionality
     let timeout, interval;
 
     const getServerTime = () => Math.round(Timing.getCurrentServerTime());
@@ -170,4 +176,4 @@
 
     document.getElementById("sa-save").addEventListener("click", calculate);
   }
-})();
+});
