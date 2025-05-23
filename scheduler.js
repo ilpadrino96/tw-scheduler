@@ -6,7 +6,7 @@
       const confirmBtn = $("#troop_confirm_go"),
         arrivalTime = $("#date_arrival"),
         form = $("#command-data-form"),
-        infoSpan = $('<span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽🌽🌽</span>');
+        infoSpan = $('<span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>');
 
       // Adjust table width
       arrivalTime.parents("table:first").attr("width", 500);
