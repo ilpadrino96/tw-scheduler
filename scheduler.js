@@ -9,55 +9,69 @@
         infoSpan = $('<span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>');
 
       // Wrap form in a flex container if not already wrapped
-      if (!form.parent().hasClass('sa-flex-container')) {
-        form.wrap('<div class="sa-flex-container" style="display:flex; align-items:flex-start; gap:20px;"></div>');
+      if (!form.parent().attr("id") || form.parent().attr("id") !== "container") {
+        form.wrap('<div id="container" style="display:flex; gap: 20px; align-items:flex-start;"></div>');
       }
 
-      // Reference the new flex container
       const container = form.parent();
 
-      // Create the schedule table
-      const scheduleTable = $(
-        '<table id="sa-schedule" class="vis" style="width: 500px; border: 1px solid #ccc; background: #f9f9f9; padding: 10px;">' +
-          '<tbody>' +
-          '<tr><th colspan="2">Programează Atacul</th></tr>' +
-          '<tr><td>Mod:</td><td>' +
-          '<input name="sa-mod" type="radio" value="arrival" checked>Soseste la ' +
-          '<input name="sa-mod" type="radio" value="launch"> Lanseaza la' +
-          '</td></tr>' +
-          '<tr><td>Data:</td><td><input name="sa-d" type="date" required style="width: 150px;"></td></tr>' +
-          '<tr><td>Ora:</td><td>' +
-          '<input name="sa-t-h" type="number" min="0" max="23" style="width:40px" required>: ' +
-          '<input name="sa-t-m" type="number" min="0" max="59" style="width:40px" required>: ' +
-          '<input name="sa-t-s" type="number" min="0" max="59" style="width:40px" required>: ' +
-          '<input name="sa-t-ms" type="number" min="0" max="999" style="width:40px" required>' +
-          '</td></tr>' +
-          '<tr><td>Lansare:</td><td id="sa-launch" style="color:green; font-weight:bold;"></td></tr>' +
-          '<tr><td>Sosire:</td><td id="sa-arrival"></td></tr>' +
-          '<tr><td>Intoarcere:</td><td id="sa-return"></td></tr>' +
-          '<tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>' +
-          '<tr><td><button type="button" id="sa-save" class="btn">Salveaza</button>' +
-          infoSpan[0].outerHTML +
-          '</td></tr>' +
-          '</tbody></table>'
-      );
+      // Only append the schedule table if not already added
+      if ($("#schedule-table").length === 0) {
+        const scheduleTable = $(`
+          <table id="schedule-table" class="vis" style="width: 400px; border: 1px solid #ccc; background-color: #f9f9f9;">
+            <thead>
+              <tr><th colspan="2">Programează Atacul</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Mod:</td>
+                <td>
+                  <input name="sa-mod" type="radio" value="arrival" checked> Soseste la
+                  <input name="sa-mod" type="radio" value="launch"> Lanseaza la
+                </td>
+              </tr>
+              <tr>
+                <td>Data:</td>
+                <td><input name="sa-d" type="date" required style="width: 150px;"></td>
+              </tr>
+              <tr>
+                <td>Ora:</td>
+                <td>
+                  <input name="sa-t-h" type="number" min="0" max="23" style="width:40px" required> :
+                  <input name="sa-t-m" type="number" min="0" max="59" style="width:40px" required> :
+                  <input name="sa-t-s" type="number" min="0" max="59" style="width:40px" required> :
+                  <input name="sa-t-ms" type="number" min="0" max="999" style="width:40px" required>
+                </td>
+              </tr>
+              <tr><td>Lansare:</td><td id="sa-launch" style="color:green; font-weight:bold;"></td></tr>
+              <tr><td>Sosire:</td><td id="sa-arrival"></td></tr>
+              <tr><td>Intoarcere:</td><td id="sa-return"></td></tr>
+              <tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>
+              <tr>
+                <td colspan="2">
+                  <button id="sa-save" class="btn" type="button">Salveaza</button>
+                  ${infoSpan[0].outerHTML}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        `);
+        container.append(scheduleTable);
 
-      // Append schedule table directly into the flex container, after the form
-      container.append(scheduleTable);
+        // Set default date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const yyyy = tomorrow.getFullYear();
+        const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+        const dd = String(tomorrow.getDate()).padStart(2, '0');
+        $('input[name="sa-d"]').val(`${yyyy}-${mm}-${dd}`);
 
-      // Set default date to tomorrow
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const yyyy = tomorrow.getFullYear();
-      const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
-      const dd = String(tomorrow.getDate()).padStart(2, '0');
-      $('input[name="sa-d"]').val(`${yyyy}-${mm}-${dd}`);
+        // Clear time inputs
+        $('input[name="sa-t-h"], input[name="sa-t-m"], input[name="sa-t-s"], input[name="sa-t-ms"]').val("");
 
-      // Clear time inputs
-      $('input[name="sa-t-h"], input[name="sa-t-m"], input[name="sa-t-s"], input[name="sa-t-ms"]').val("");
-
-      // Set event handler on save button
-      $("#sa-save").click(() => calculate());
+        // Set event handler
+        $("#sa-save").click(() => calculate());
+      }
     };
 
     const getServerTime = () => Math.round(Timing.getCurrentServerTime());
@@ -82,9 +96,7 @@
         : 0;
 
     const setLaunchTime = (t) => $("#sa-launch").text(formatTime(t));
-
     const setArrivalTime = (t) => $("#sa-arrival").text(formatTime(t));
-
     const setReturnTime = (t) => $("#sa-return").text(formatTime(t));
 
     const formatCountdown = (ms) => {
@@ -92,12 +104,7 @@
         m = Math.floor((ms % 3600000) / 60000),
         s = Math.floor((ms % 60000) / 1000),
         msRem = ms % 1000;
-      return (
-        `${String(h).padStart(2, "0")}:` +
-        `${String(m).padStart(2, "0")}:` +
-        `${String(s).padStart(2, "0")}.` +
-        `${String(msRem).padStart(3, "0")}`
-      );
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}.${String(msRem).padStart(3, "0")}`;
     };
 
     const playBeep = () => {
@@ -122,7 +129,6 @@
         const inputDate = getDateInput(),
           duration = getTravelTime();
 
-        // Calculate launch and arrival depending on mode
         const launchTime = isArrivalMode()
           ? new Date(inputDate.getTime() - duration)
           : inputDate;
