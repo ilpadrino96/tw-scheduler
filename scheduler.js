@@ -8,19 +8,24 @@
         form = $("#command-data-form"),
         infoSpan = $('<span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>');
 
-      // Adjust table width of arrivalTime parent to make space
-      arrivalTime.parents("table:first").attr("width", 300);
+      // Wrap form in a flex container if not already wrapped
+      if (!form.parent().hasClass('sa-flex-container')) {
+        form.wrap('<div class="sa-flex-container" style="display:flex; align-items:flex-start; gap:20px;"></div>');
+      }
 
-      // Create a new table container for the scheduling UI
+      // Reference the new flex container
+      const container = form.parent();
+
+      // Create the schedule table
       const scheduleTable = $(
-        '<table id="sa-schedule" style="width: 500px; float: right; border: 1px solid #ccc; padding: 5px; background: #f9f9f9;">' +
+        '<table id="sa-schedule" class="vis" style="width: 500px; border: 1px solid #ccc; background: #f9f9f9; padding: 10px;">' +
           '<tbody>' +
-          '<tr><td>Programeaza:</td><td style="position: relative"></td></tr>' +
+          '<tr><th colspan="2">Programează Atacul</th></tr>' +
           '<tr><td>Mod:</td><td>' +
           '<input name="sa-mod" type="radio" value="arrival" checked>Soseste la ' +
           '<input name="sa-mod" type="radio" value="launch"> Lanseaza la' +
           '</td></tr>' +
-          '<tr><td>Data:</td><td><input name="sa-d" type="date" required></td></tr>' +
+          '<tr><td>Data:</td><td><input name="sa-d" type="date" required style="width: 150px;"></td></tr>' +
           '<tr><td>Ora:</td><td>' +
           '<input name="sa-t-h" type="number" min="0" max="23" style="width:40px" required>: ' +
           '<input name="sa-t-m" type="number" min="0" max="59" style="width:40px" required>: ' +
@@ -31,20 +36,20 @@
           '<tr><td>Sosire:</td><td id="sa-arrival"></td></tr>' +
           '<tr><td>Intoarcere:</td><td id="sa-return"></td></tr>' +
           '<tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>' +
-          '<tr><td><button type="button" id="sa-save" class="btn float_left">Salveaza</button>' +
+          '<tr><td><button type="button" id="sa-save" class="btn">Salveaza</button>' +
           infoSpan[0].outerHTML +
           '</td></tr>' +
           '</tbody></table>'
       );
 
-      // Append the scheduling UI table to the form container or a suitable parent
-      form.after(scheduleTable);
+      // Append schedule table directly into the flex container, after the form
+      container.append(scheduleTable);
 
       // Set default date to tomorrow
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       const yyyy = tomorrow.getFullYear();
-      const mm = String(tomorrow.getMonth() + 1).padStart(2, '0'); // Months start at 0!
+      const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
       const dd = String(tomorrow.getDate()).padStart(2, '0');
       $('input[name="sa-d"]').val(`${yyyy}-${mm}-${dd}`);
 
@@ -157,7 +162,6 @@
       }
     };
 
-    // Check if we're on the right page
     if ($("#command-data-form").length === 0) {
       alert("Trebuie sa fii pe pagina de confirmare a comenzii!");
     } else {
