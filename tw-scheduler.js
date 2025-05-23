@@ -13,6 +13,24 @@ waitForGlobals(() => {
   const form = contentValue.querySelector("form");
   if (!form) return alert("form inside #content_value not found");
 
+  // Add custom function button next to "Trimite atacul"
+  const submitBtn = form.querySelector("#troop_confirm_submit");
+  if (submitBtn && !document.getElementById("my-custom-btn")) {
+    const customBtn = document.createElement("button");
+    customBtn.id = "my-custom-btn";
+    customBtn.type = "button"; // prevent form submit
+    customBtn.textContent = "My Function";
+    customBtn.className = "btn";  // style class, adjust as needed
+    customBtn.style.marginLeft = "10px";
+
+    customBtn.addEventListener("click", () => {
+      alert("My custom function triggered!");
+      // Your custom logic here
+    });
+
+    submitBtn.insertAdjacentElement("afterend", customBtn);
+  }
+
   const existingDiv = form.querySelector("div");
   if (!existingDiv) return alert("Existing div with first table not found");
 
