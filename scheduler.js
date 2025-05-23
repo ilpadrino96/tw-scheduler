@@ -4,16 +4,15 @@
 
     const init = () => {
       const form = $("#command-data-form");
-      const infoSpan = $('<span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>');
 
-      // Wrap form in a flex container if not already wrapped
+      // Wrap form in flex container if not already wrapped
       if (!form.parent().attr("id") || form.parent().attr("id") !== "container") {
-        form.wrap('<div id="container" style="display:flex; gap: 20px; align-items:flex-start;"></div>');
+        form.wrap('<div id="container" style="display:flex; align-items:flex-start; gap: 20px;"></div>');
       }
 
       const container = form.parent();
 
-      // Insert Planner Table on the left
+      // Add Planner table on the LEFT side of the form
       if ($("#planner-table").length === 0) {
         const plannerTable = $(`
           <table id="planner-table" class="vis" style="width: 400px; border: 1px solid #ccc; background-color: #e9f7ef;">
@@ -33,10 +32,11 @@
             </tbody>
           </table>
         `);
+        // Insert BEFORE the form (left side)
         form.before(plannerTable);
       }
 
-      // Insert Attack Schedule Table on the right
+      // Add Schedule table on the RIGHT side of the form
       if ($("#schedule-table").length === 0) {
         const scheduleTable = $(`
           <table id="schedule-table" class="vis" style="width: 400px; border: 1px solid #ccc; background-color: #f9f9f9;">
@@ -71,15 +71,16 @@
               <tr>
                 <td colspan="2">
                   <button id="sa-save" class="btn" type="button">Salveaza</button>
-                  ${infoSpan[0].outerHTML}
+                  <span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>
                 </td>
               </tr>
             </tbody>
           </table>
         `);
-        container.append(scheduleTable);
+        // Insert AFTER the form (right side)
+        form.after(scheduleTable);
 
-        // Default date: tomorrow
+        // Default date
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const yyyy = tomorrow.getFullYear();
@@ -87,10 +88,8 @@
         const dd = String(tomorrow.getDate()).padStart(2, '0');
         $('input[name="sa-d"]').val(`${yyyy}-${mm}-${dd}`);
 
-        // Clear time inputs
         $('input[name="sa-t-h"], input[name="sa-t-m"], input[name="sa-t-s"], input[name="sa-t-ms"]').val("");
 
-        // Set event handler
         $("#sa-save").click(() => calculate());
       }
     };
