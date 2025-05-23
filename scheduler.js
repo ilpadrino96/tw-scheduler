@@ -10,7 +10,7 @@
         form.wrap('<div id="container" style="display:flex; align-items:flex-start; gap: 20px;"></div>');
       }
 
-      const container = form.parent();
+      const container = form.parent(); // #container div
 
       // Add Planner table on the LEFT side of the form
       if ($("#planner-table").length === 0) {
@@ -32,8 +32,7 @@
             </tbody>
           </table>
         `);
-        // Insert BEFORE the form (left side)
-        form.before(plannerTable);
+        container.prepend(plannerTable); // Insert inside container, before the form
       }
 
       // Add Schedule table on the RIGHT side of the form
@@ -77,10 +76,9 @@
             </tbody>
           </table>
         `);
-        // Insert AFTER the form (right side)
-        form.after(scheduleTable);
+        container.append(scheduleTable); // Insert inside container, after the form
 
-        // Default date
+        // Default date setup
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const yyyy = tomorrow.getFullYear();
