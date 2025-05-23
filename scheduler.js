@@ -32,7 +32,7 @@
 
     scheduleTable.innerHTML = `
       <thead>
-        <tr><th colspan="2">Programează Atacul 🏹🌽</th></tr>
+        <tr><th colspan="2">Programează Atacul</th></tr>
       </thead>
       <tbody>
         <tr>
@@ -57,10 +57,12 @@
         </tr>
         <tr><td>Lansare:</td><td id="sa-launch" style="color:green; font-weight:bold;"></td></tr>
         <tr><td>Sosire:</td><td id="sa-arrival"></td></tr>
+        <tr><td>Intoarcere:</td><td id="sa-return"></td></tr>
         <tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>
         <tr>
           <td colspan="2">
             <button id="sa-save" class="btn" type="button">Salveaza</button>
+            <span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>
           </td>
         </tr>
       </tbody>
