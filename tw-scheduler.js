@@ -57,6 +57,7 @@
         <tr><td>Lansare:</td><td id="sa-launch" style="color:green; font-weight:bold;"></td></tr>
         <tr><td>Sosire:</td><td id="sa-arrival"></td></tr>
         <tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>
+        <tr><td colspan="2" align="center">Pe ei cocenii mei ! 🌽🌽🌽</td></tr>
       </tbody>
     `;
 
@@ -70,7 +71,7 @@
     newSaveBtn.id = "sa-save";
     newSaveBtn.className = "btn";
     newSaveBtn.type = "button";
-    newSaveBtn.textContent = "Salveaza Programarea";
+    newSaveBtn.textContent = "👍 Salveaza Programarea";
 
     form.appendChild(newSaveBtn);
 
