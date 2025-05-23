@@ -13,24 +13,6 @@ waitForGlobals(() => {
   const form = contentValue.querySelector("form");
   if (!form) return alert("form inside #content_value not found");
 
-  // Add custom function button next to "Trimite atacul"
-  const submitBtn = form.querySelector("#troop_confirm_submit");
-  if (submitBtn && !document.getElementById("my-custom-btn")) {
-    const customBtn = document.createElement("button");
-    customBtn.id = "my-custom-btn";
-    customBtn.type = "button"; // prevent form submit
-    customBtn.textContent = "My Function";
-    customBtn.className = "btn";  // style class, adjust as needed
-    customBtn.style.marginLeft = "10px";
-
-    customBtn.addEventListener("click", () => {
-      alert("My custom function triggered!");
-      // Your custom logic here
-    });
-
-    submitBtn.insertAdjacentElement("afterend", customBtn);
-  }
-
   const existingDiv = form.querySelector("div");
   if (!existingDiv) return alert("Existing div with first table not found");
 
@@ -84,15 +66,22 @@ waitForGlobals(() => {
         <tr><td>Sosire:</td><td id="sa-arrival"></td></tr>
         <tr><td>Intoarcere:</td><td id="sa-return"></td></tr>
         <tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>
-        <tr>
-          <td colspan="2">
-            <button id="sa-save" class="btn" type="button">Salveaza</button>
-          </td>
-        </tr>
       </tbody>
     `;
 
     flexWrapper.appendChild(scheduleTable);
+
+    // Mutăm butonul Salveaza jos lângă Trimite atacul
+    const submitBtn = form.querySelector("#troop_confirm_submit");
+    if (submitBtn && !document.getElementById("sa-save")) {
+      const saveBtn = document.createElement("button");
+      saveBtn.id = "sa-save";
+      saveBtn.className = "btn";
+      saveBtn.type = "button";
+      saveBtn.textContent = "Salveaza";
+
+      submitBtn.insertAdjacentElement("afterend", saveBtn);
+    }
 
     let timeout, interval;
 
