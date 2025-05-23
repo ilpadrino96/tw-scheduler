@@ -32,7 +32,7 @@
 
     scheduleTable.innerHTML = `
       <thead>
-        <tr><th colspan="2">Programează Atacul</th></tr>
+        <tr><th colspan="2">Programează Atacul 🏹🌽</th></tr>
       </thead>
       <tbody>
         <tr>
@@ -61,7 +61,6 @@
         <tr>
           <td colspan="2">
             <button id="sa-save" class="btn" type="button">Salveaza</button>
-            <span class="float_right" style="position: absolute; right: 5px; padding: 3px">🌽</span>
           </td>
         </tr>
       </tbody>
