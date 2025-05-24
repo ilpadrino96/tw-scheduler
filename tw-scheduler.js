@@ -8,7 +8,6 @@
   const existingDiv = form.querySelector("div");
   if (!existingDiv) return alert("Existing div with first table not found");
 
-  // Creează flex wrapper dacă nu există
   let flexWrapper = form.querySelector("#flex-wrapper");
   if (!flexWrapper) {
     flexWrapper = document.createElement("div");
@@ -18,7 +17,6 @@
     flexWrapper.style.alignItems = "flex-start";
     flexWrapper.style.gap = "20px";
     flexWrapper.style.marginBottom = "20px";
-
     form.insertBefore(flexWrapper, existingDiv);
     flexWrapper.appendChild(existingDiv);
   }
@@ -56,6 +54,7 @@
         </tr>
         <tr><td>Lansare:</td><td id="sa-launch" style="color:green; font-weight:bold;"></td></tr>
         <tr><td>Sosire:</td><td id="sa-arrival"></td></tr>
+        <tr><td>Întoarcere:</td><td id="sa-return"></td></tr>
         <tr><td>Countdown:</td><td id="sa-countdown" style="font-weight:bold; color:blue;"></td></tr>
         <tr><td colspan="2" align="center">Pe ei cocenii mei ! 🌽🌽🌽</td></tr>
       </tbody>
@@ -63,18 +62,17 @@
 
     flexWrapper.appendChild(scheduleTable);
 
-    // Mută butonul Salveaza în formular, jos lângă trimite atacul
     const saveBtn = document.getElementById("sa-save");
-    if (saveBtn) saveBtn.remove(); // elimină butonul din tabel dacă există deja
+    if (saveBtn) saveBtn.remove();
 
     const newSaveBtn = document.createElement("button");
     newSaveBtn.id = "sa-save";
     newSaveBtn.className = "btn";
     newSaveBtn.type = "button";
     newSaveBtn.textContent = "👍 Salveaza Programarea";
-
     form.appendChild(newSaveBtn);
 
+    // ==== Utility Functions ====
     let timeout, interval;
 
     const getServerTime = () => Math.round(Timing.getCurrentServerTime());
@@ -94,11 +92,22 @@
     const formatTime = (d) =>
       d instanceof Date
         ? window.Format.date(d / 1000, true) + ":" + window.Format.padLead(d.getUTCMilliseconds(), 3)
-        : 0;
+        : "";
 
-    const setLaunchTime = (t) => (document.getElementById("sa-launch").textContent = formatTime(t));
-    const setArrivalTime = (t) => (document.getElementById("sa-arrival").textContent = formatTime(t));
-    const setReturnTime = (t) => (document.getElementById("sa-return").textContent = formatTime(t));
+    const setLaunchTime = (t) => {
+      const el = document.getElementById("sa-launch");
+      if (el) el.textContent = formatTime(t);
+    };
+
+    const setArrivalTime = (t) => {
+      const el = document.getElementById("sa-arrival");
+      if (el) el.textContent = formatTime(t);
+    };
+
+    const setReturnTime = (t) => {
+      const el = document.getElementById("sa-return");
+      if (el) el.textContent = formatTime(t);
+    };
 
     const formatCountdown = (ms) => {
       const h = Math.floor(ms / 3600000),
