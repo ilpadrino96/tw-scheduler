@@ -1,6 +1,6 @@
 (() => {
   const f = document.getElementById("command-data-form");
-  if (!f) return alert("You must be on the command confirmation page!");
+  if (!f) return ui.UI.InfoMessage("You must be on the command confirmation page!");
   if (!document.getElementById("sTbl")) {
     const d = f.querySelector("div"), w = document.createElement("div");
     w.id = "fw";
