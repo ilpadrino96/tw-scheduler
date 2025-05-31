@@ -1,6 +1,6 @@
 (() => {
   const f = document.getElementById("command-data-form");
-  if (!f) return UI.ErrorMessage("You must be on the command confirmation page!");
+  if (!f) return UI.ErrorMessage("Trebuie sa fii pe pagina de confirmare atac!");
   if (!document.getElementById("sTbl")) {
     const d = f.querySelector("div"), w = document.createElement("div");
     w.id = "fw";
